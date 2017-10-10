@@ -22,14 +22,15 @@ import org.myworldgis.projection.Projection;
 import org.myworldgis.projection.ProjectionFormat;
 import org.myworldgis.util.StringUtils;
 import org.ngs.ngunits.converter.AbstractUnitConverter;
+import org.nlogo.core.File;
+import org.nlogo.core.Syntax;
+import org.nlogo.core.SyntaxJ;
 import org.nlogo.api.Argument;
 import org.nlogo.api.Context;
 import org.nlogo.api.ExtensionException;
-import org.nlogo.core.File;
 import org.nlogo.api.LogoException;
-import org.nlogo.core.Syntax;
-import org.nlogo.core.SyntaxJ;
 import org.nlogo.api.World;
+import org.nlogo.nvm.Workspace;
 
 
 /**
@@ -44,7 +45,8 @@ public final strictfp class LoadDataset extends GISExtension.Reporter {
     /** */
     private static Dataset loadShapefile (String shpFilePath,
                                           Projection srcProj,
-                                          Projection dstProj) throws ExtensionException, IOException {
+                                          Projection dstProj,
+                                          Workspace workspace) throws ExtensionException, IOException {
         GeometryTransformer inverse = null;
         GeometryTransformer forward = null;
         boolean reproject = false;
@@ -58,7 +60,7 @@ public final strictfp class LoadDataset extends GISExtension.Reporter {
         ESRIShapefileReader shp = null;
         DBaseFileReader dbf = null;
         try {
-            File shpFile = GISExtension.getState().getFile(shpFilePath);
+            File shpFile = GISExtension.getState().getFile(shpFilePath, workspace);
             if (shpFile == null) {
                 throw new ExtensionException("shapefile " + shpFilePath + " not found");
             }
@@ -66,7 +68,7 @@ public final strictfp class LoadDataset extends GISExtension.Reporter {
                                           AbstractUnitConverter.IDENTITY,
                                           GISExtension.getState().factory());
             String dbfFilePath = StringUtils.changeFileExtension(shpFilePath, "dbf");
-            File dbfFile = GISExtension.getState().getFile(dbfFilePath);
+            File dbfFile = GISExtension.getState().getFile(dbfFilePath, workspace);
             if (dbfFile == null) {
                 throw new ExtensionException("dbf file " + dbfFilePath + " not found");
             }
@@ -125,10 +127,11 @@ public final strictfp class LoadDataset extends GISExtension.Reporter {
     /** */
     private static RasterDataset loadAsciiGrid (String ascFilePath,
                                                 Projection srcProj,
-                                                Projection dstProj) throws ExtensionException, IOException {
+                                                Projection dstProj,
+                                                Workspace workspace) throws ExtensionException, IOException {
         AsciiGridFileReader asc = null;
         try {
-            File ascFile = GISExtension.getState().getFile(ascFilePath);
+            File ascFile = GISExtension.getState().getFile(ascFilePath, workspace);
             if (ascFile == null) {
                 throw new ExtensionException("ascii file " + ascFilePath + " not found");
             }
@@ -173,9 +176,10 @@ public final strictfp class LoadDataset extends GISExtension.Reporter {
     public Object reportInternal (Argument args[], Context context) 
             throws ExtensionException, IOException, LogoException, ParseException {
         String dataFilePath = args[0].getString();
+        Workspace workspace = ((org.nlogo.nvm.ExtensionContext) context).workspace();
         Projection netLogoProjection = GISExtension.getState().getProjection();
         Projection datasetProjection = null;
-        File prjFile = GISExtension.getState().getFile(StringUtils.changeFileExtension(dataFilePath, "prj"));
+        File prjFile = GISExtension.getState().getFile(StringUtils.changeFileExtension(dataFilePath, "prj"), workspace);
         if (prjFile != null) {
             BufferedReader prjReader = new BufferedReader(new InputStreamReader(prjFile.getInputStream()));
             try {
@@ -187,10 +191,10 @@ public final strictfp class LoadDataset extends GISExtension.Reporter {
         String extension = StringUtils.getFileExtension(dataFilePath);
         Dataset result = null;
         if (extension.equalsIgnoreCase(ESRIShapefileReader.SHAPEFILE_EXTENSION)) {
-            result = loadShapefile(dataFilePath, datasetProjection, netLogoProjection);
+            result = loadShapefile(dataFilePath, datasetProjection, netLogoProjection, workspace);
         } else if (extension.equalsIgnoreCase(AsciiGridFileReader.ASCII_GRID_FILE_EXTENSION_1) ||
                    extension.equalsIgnoreCase(AsciiGridFileReader.ASCII_GRID_FILE_EXTENSION_2)) {
-            result = loadAsciiGrid(dataFilePath, datasetProjection, netLogoProjection);
+            result = loadAsciiGrid(dataFilePath, datasetProjection, netLogoProjection, workspace);
         } else {
             throw new ExtensionException("unsupported file type "+extension);
         }

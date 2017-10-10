@@ -98,7 +98,7 @@ public final strictfp class GISExtension extends DefaultClassManager {
     /** */
     public void runOnce (ExtensionManager em) throws ExtensionException {
         super.runOnce(em);
-        _state = new GISExtensionState(em);
+        _state = new GISExtensionState();
     }
     
     /** */

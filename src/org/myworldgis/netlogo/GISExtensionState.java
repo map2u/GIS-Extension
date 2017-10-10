@@ -37,9 +37,6 @@ public final strictfp class GISExtensionState implements ExtensionObject {
     //--------------------------------------------------------------------------
     
     /** */
-    private final ExtensionManager _em;
-    
-    /** */
     private final GeometryFactory _factory;
     
     /** */
@@ -68,8 +65,7 @@ public final strictfp class GISExtensionState implements ExtensionObject {
     //--------------------------------------------------------------------------
     
     /** */
-    public GISExtensionState (org.nlogo.api.ExtensionManager em) {
-        _em = (ExtensionManager)em;
+    public GISExtensionState () {
         _factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING));
         _projection = null;
         _datasetCount = 0;
@@ -84,19 +80,19 @@ public final strictfp class GISExtensionState implements ExtensionObject {
     //--------------------------------------------------------------------------
     
     /** */
-    public File getFile (String path) {
-        try {
-            String fullPath = _em.workspace().fileManager().attachPrefix(path);
-            if (_em.workspace().fileManager().fileExists(fullPath)) {
-                return _em.workspace().fileManager().getFile(fullPath);
-            } 
-        } catch (IOException e) { }
-        return null;
+    public File getFile (String path, Workspace workspace) {
+      try {
+        String fullPath = workspace.fileManager().attachPrefix(path);
+        if (workspace.fileManager().fileExists(fullPath)) {
+          return workspace.fileManager().getFile(fullPath);
+        }
+      } catch (IOException e) { }
+      return null;
     }
-    
+
     /** */
     public GeometryFactory factory () {
-        return _factory;
+      return _factory;
     }
     
     /** */

@@ -9,15 +9,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.ParseException;
 import org.myworldgis.projection.ProjectionFormat;
-import org.nlogo.api.Argument;
-import org.nlogo.api.Context;
-import org.nlogo.api.ExtensionException;
 import org.nlogo.core.File;
-import org.nlogo.api.LogoException;
 import org.nlogo.core.Syntax;
 import org.nlogo.core.SyntaxJ;
 import org.nlogo.core.SyntaxJ;
-
+import org.nlogo.api.Argument;
+import org.nlogo.api.Context;
+import org.nlogo.api.ExtensionException;
+import org.nlogo.api.LogoException;
+import org.nlogo.nvm.Workspace;
 
 /**
  * 
@@ -39,10 +39,11 @@ public final strictfp class LoadCoordinateSystem extends GISExtension.Command {
     }
 
     /** */
-    public void performInternal (Argument args[], Context context) 
+    public void performInternal (Argument args[], Context context)
             throws ExtensionException, IOException, LogoException, ParseException {
         String filePath = args[0].getString();
-        File prjFile = GISExtension.getState().getFile(filePath);
+        Workspace workspace = ((org.nlogo.nvm.ExtensionContext) context).workspace();
+        File prjFile = GISExtension.getState().getFile(filePath, workspace);
         if (prjFile == null) {
             throw new ExtensionException("projection file " + filePath + " does not exist");
         }
