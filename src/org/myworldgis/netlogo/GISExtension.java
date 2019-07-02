@@ -121,6 +121,7 @@ public final strictfp class GISExtension extends DefaultClassManager {
         primitiveManager.addPrimitive("turtle-dataset", new TurtleDataset());
         primitiveManager.addPrimitive("link-dataset", new LinkDataset());
         
+        primitiveManager.addPrimitive("getMinDistanceFromFeatures", new VectorDataset.GetMinDistanceFromFeatures());
         primitiveManager.addPrimitive("shape-type-of", new GetShapeType());
         primitiveManager.addPrimitive("property-names", new VectorDataset.GetPropertyNames());
         primitiveManager.addPrimitive("feature-list-of", new VectorDataset.GetFeatures());
