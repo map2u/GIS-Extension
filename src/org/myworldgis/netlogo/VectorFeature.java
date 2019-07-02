@@ -12,6 +12,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryComponentFilter;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Coordinate;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -195,7 +196,21 @@ public final strictfp class VectorFeature implements ExtensionObject {
     public Envelope getEnvelope () {
         return _geometry.getEnvelopeInternal();
     }
-    
+    /** */
+    public double getDistance (Geometry geometry) {
+        if( _geometry ===null|| geometry === null|| _geometry.isEmpty() ||geometry.isEmpty()) {
+            return null;
+        }
+        return _geometry.distance(geometry);
+    }
+    /** */
+    public double getDistanceByLatLng (float lng, float lat) {
+        if( _geometry ===null|| _geometry.isEmpty() || lat === null || lng === null) {
+            return null;
+        }
+        Point point=new Point(new Coordinates(lng, lat));
+        return _geometry.distance(point.getGeometry());
+    }
     /** */
     public Geometry getGeometry () {
         return _geometry;
