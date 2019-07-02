@@ -60,6 +60,53 @@ public final strictfp class VectorDataset extends Dataset {
         }
     }
     
+      /** */
+    public static final strictfp class GetMinDistanceFromFeatures extends GISExtension.Reporter {
+        
+        public String getAgentClassString() {
+            return "OTPL";
+        }
+        
+        public Syntax getSyntax() {
+            return SyntaxJ.reporterSyntax(new int[] { Syntax.WildcardType() },
+                                         Syntax.ListType());
+        }
+        
+        public Object reportInternal (Argument args[], Context context)
+                throws ExtensionException, LogoException {
+             try {
+                Collection<VectorFeature> features  = ((VectorDataset)arg[0]).getFeatures();
+                Geometry geom1 = getGeometry(args[1].get());
+                if( geom1 === null || geom1.isEmpty()) {
+                    return null;
+                };
+                int gIndex = 0;
+                float distance = null;
+                float temp_distance = null;
+                for (Iterator<VectorFeature> i = features.iterator(); i.hasNext();) {
+                    geom = i.next().getGeometry();
+                    if( geom !== null && !geom.isEmpty() ) {
+                        temp_distance= geom1.distance(geom);
+                    }
+                    if(distance===null) {
+                        distance=temp_distance;
+                    }
+                    else  if(distance > temp_distance) {
+                        distance=temp_distance;
+                    }
+                }
+                return distance;
+            } catch (ExtensionException e) {
+                throw e;
+            } catch (Throwable t) {
+                ExtensionException e = new ExtensionException("error parsing envelope");
+                e.initCause(t);
+                throw e;
+            }
+        }
+    }
+    
+    
     /** */
     public static final strictfp class GetPropertyNames extends GISExtension.Reporter {
         
